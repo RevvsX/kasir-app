@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  user       User[]
+  created_at DateTime @default(now())
+  updated_at DateTime
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  full_name    String
+  username     String        @unique
+  password     String
+  address      String
+  phone_number String
+  roleId       Int
+  role         Role          @relation(fields: [roleId], references: [id])
+  transaction  Transaction[]
+  created_at   DateTime      @default(now())
+  updated_at   DateTime
+}
+
+model Category {
+  id            Int       @id @default(autoincrement())
+  category_name String
+  product       Product[]
+  created_at    DateTime  @default(now())
+  updated_at    DateTime
+}
+
+model Product {
+  id                Int                 @id @default(autoincrement())
+  product_name      String
+  purchase_price    String
+  selling_price     String
+  stock             Int
+  barcode           String
+  categoryId        Int
+  category          Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  created_at        DateTime            @default(now())
+  updated_at        DateTime
+  TransactionDetail TransactionDetail[]
+}
+
+model Member {
+  id           Int           @id @default(autoincrement())
+  name         String
+  address      String
+  phone_number String
+  transaction  Transaction[]
+  created_at   DateTime      @default(now())
+  updated_at   DateTime
+}
+
+model Transaction {
+  id                Int                 @id @default(autoincrement())
+  discount          Decimal
+  total_price       Decimal
+  money_paid        Decimal
+  change            Decimal
+  userId            Int
+  memberId          Int?
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  member            Member?             @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  created_at        DateTime            @default(now())
+  updated_at        DateTime
+  TransactionDetail TransactionDetail[]
+}
+
+model TransactionDetail {
+  id            Int         @id @default(autoincrement())
+  productId     Int
+  product       Product     @relation(references: [id], fields: [productId], onDelete: Cascade)
+  transactionId Int
+  transaction   Transaction @relation(references: [id], fields: [transactionId], onDelete: Cascade)
+  selling_price Decimal
+  quantity      Int
+  sub_total     Int
+  created_at    DateTime    @default(now())
+  updated_at    DateTime
+}
