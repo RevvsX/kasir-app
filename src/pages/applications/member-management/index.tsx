@@ -1,5 +1,5 @@
-import { columns } from "@/components/pages/product-management/columns";
-import { DataTable } from "@/components/pages/product-management/DataTable";
+import { columns } from "@/components/pages/member-management/columns";
+import { DataTable } from "@/components/pages/member-management/DataTable";
 import AppLayout from "@/layout/AppLayout";
 import { InferGetServerSidePropsType } from "next";
 
@@ -9,12 +9,9 @@ export function getServerSideProps() {
       data: [
         {
           id: 1,
-          product_name: "Shampo",
-          purchase_price: "10000",
-          selling_price: "10000",
-          stock: "10",
-          category: "Mandi",
-          barcode: "17872878278",
+          name: "Aldon",
+          address: "Bangunjiwo",
+          phone_number: "081982773628",
         },
       ],
     },

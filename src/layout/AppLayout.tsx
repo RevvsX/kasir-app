@@ -12,11 +12,11 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="p-2">
-        <div className="w-full flex items-center gap-4 p-2">
+        <div className="flex items-center gap-4 p-2">
           <SidebarTrigger />
           <DynamicBreadcrumb />
         </div>
-        <main className="p-2">{children}</main>
+        <main className="p-2 max-w-full">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

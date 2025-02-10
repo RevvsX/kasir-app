@@ -32,7 +32,7 @@ import {
 } from "../ui/dropdown-menu";
 import { usePathname } from "next/navigation";
 
-const items = [
+const applications_url = [
   {
     title: "Dashboard",
     url: "/applications/dashboard",
@@ -55,17 +55,20 @@ const items = [
   },
   {
     title: "Member management",
-    url: "#",
+    url: "/applications/member-management",
     icon: UserCheck2,
   },
+];
+
+const transactions_url = [
   {
-    title: "Transaction management",
-    url: "#",
+    title: "Chasier",
+    url: "/transactions/cashier",
     icon: Coins,
   },
   {
     title: "Report",
-    url: "#",
+    url: "/transactions/report",
     icon: Book,
   },
 ];
@@ -86,10 +89,29 @@ const AppSidebar = () => {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
+          <SidebarGroupLabel>Transactions</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {transactions_url.map((item) => {
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={pathname == item.url}>
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
           <SidebarGroupLabel>Applications</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => {
+              {applications_url.map((item) => {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={pathname == item.url}>
