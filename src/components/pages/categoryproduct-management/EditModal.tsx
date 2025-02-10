@@ -19,12 +19,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-const formschema = z.object({
-  category_name: z.string().min(3, {
-    message: "Category name must be at least 3 characters",
-  }),
-});
+import formschema from "./formschema";
 
 const EditModal = ({ category_name }: { category_name: string }) => {
   const form = useForm<z.infer<typeof formschema>>({

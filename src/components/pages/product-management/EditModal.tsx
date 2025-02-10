@@ -28,15 +28,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-const formschema = z.object({
-  product_name: z.string().min(1, "Product name is required"),
-  purchase_price: z.string().min(1, "Purchase price is required"),
-  selling_price: z.string().min(1, "Selling price is required"),
-  stock: z.string().min(1, "Stock is required"),
-  category: z.string().min(1, "Category is required"),
-  barcode: z.string().min(1, "Barcode is required"),
-});
+import formschema from "./formschema";
 
 const EditModal = ({
   product_name,

@@ -19,20 +19,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-const formschema = z.object({
-  username: z.string().min(4, {
-    message: "Username must be at least 4 characters",
-  }),
-  email: z.string().email({
-    message: "Email is invalid",
-  }),
-  password: z
-    .string()
-    .min(4, { message: "Password must be at least 4 characters" }),
-  address: z.string(),
-  phone_number: z.string(),
-});
+import formschema from "./formschema";
 
 const CreateModal = () => {
   const form = useForm<z.infer<typeof formschema>>({
