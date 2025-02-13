@@ -62,7 +62,7 @@ const applications_url = [
 
 const transactions_url = [
   {
-    title: "Chasier",
+    title: "Cashier",
     url: "/transactions/cashier",
     icon: Coins,
   },
@@ -89,10 +89,10 @@ const AppSidebar = () => {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Transactions</SidebarGroupLabel>
+          <SidebarGroupLabel>Applications</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {transactions_url.map((item) => {
+              {applications_url.map((item) => {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={pathname == item.url}>
@@ -108,10 +108,10 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Applications</SidebarGroupLabel>
+          <SidebarGroupLabel>Transactions</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {applications_url.map((item) => {
+              {transactions_url.map((item) => {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={pathname == item.url}>
