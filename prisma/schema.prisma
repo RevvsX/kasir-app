@@ -9,16 +9,13 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-model Role {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique
-  user       User[]
-  created_at DateTime @default(now())
-  updated_at DateTime
+enum Role {
+  ADMIN
+  OFFICER
 }
 
 model User {
@@ -28,11 +25,10 @@ model User {
   password     String
   address      String
   phone_number String
-  roleId       Int
-  role         Role          @relation(fields: [roleId], references: [id])
+  role         Role
   transaction  Transaction[]
   created_at   DateTime      @default(now())
-  updated_at   DateTime
+  updated_at   DateTime?
 }
 
 model Category {
@@ -40,7 +36,7 @@ model Category {
   category_name String
   product       Product[]
   created_at    DateTime  @default(now())
-  updated_at    DateTime
+  updated_at    DateTime?
 }
 
 model Product {
@@ -53,7 +49,7 @@ model Product {
   categoryId        Int
   category          Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   created_at        DateTime            @default(now())
-  updated_at        DateTime
+  updated_at        DateTime?
   TransactionDetail TransactionDetail[]
 }
 
@@ -64,7 +60,7 @@ model Member {
   phone_number String
   transaction  Transaction[]
   created_at   DateTime      @default(now())
-  updated_at   DateTime
+  updated_at   DateTime?
 }
 
 model Transaction {
@@ -78,7 +74,7 @@ model Transaction {
   user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   member            Member?             @relation(fields: [memberId], references: [id], onDelete: Cascade)
   created_at        DateTime            @default(now())
-  updated_at        DateTime
+  updated_at        DateTime?
   TransactionDetail TransactionDetail[]
 }
 
@@ -92,5 +88,5 @@ model TransactionDetail {
   quantity      Int
   sub_total     Int
   created_at    DateTime    @default(now())
-  updated_at    DateTime
+  updated_at    DateTime?
 }

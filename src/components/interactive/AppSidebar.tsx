@@ -31,50 +31,69 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 
-const applications_url = [
-  {
-    title: "Dashboard",
-    url: "/applications/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "User management",
-    url: "/applications/user-management",
-    icon: Users2,
-  },
-  {
-    title: "Category product management",
-    url: "/applications/categoryproduct-management",
-    icon: CircleDivide,
-  },
-  {
-    title: "Product management",
-    url: "/applications/product-management",
-    icon: FolderArchive,
-  },
-  {
-    title: "Member management",
-    url: "/applications/member-management",
-    icon: UserCheck2,
-  },
-];
 
-const transactions_url = [
+
+const url = [
   {
-    title: "Cashier",
-    url: "/transactions/cashier",
-    icon: Coins,
+    category: "Applications",
+    url: [
+      {
+        title: "Dashboard",
+        url: "/applications/dashboard",
+        icon: LayoutDashboard,
+        canAccess: ["ADMIN", "OFFICER"]
+      },
+      {
+        title: "User management",
+        url: "/applications/user-management",
+        icon: Users2,
+        canAccess: ["ADMIN"]
+      },
+      {
+        title: "Category product management",
+        url: "/applications/categoryproduct-management",
+        icon: CircleDivide,
+        canAccess: ["ADMIN"]
+      },
+      {
+        title: "Product management",
+        url: "/applications/product-management",
+        icon: FolderArchive,
+        canAccess: ["ADMIN"]
+      },
+      {
+        title: "Member management",
+        url: "/applications/member-management",
+        icon: UserCheck2,
+        canAccess: ["ADMIN"]
+      },
+    ]
   },
   {
-    title: "Report",
-    url: "/transactions/report",
-    icon: Book,
-  },
-];
+    category: "Transactions",
+    url: [
+      {
+        title: "Cashier",
+        url: "/transactions/cashier",
+        icon: Coins,
+        canAccess: ["ADMIN", "OFFICER"]
+      },
+      {
+        title: "Report",
+        url: "/transactions/report",
+        icon: Book,
+        canAccess: ["ADMIN"]
+      },
+    ]
+  }
+]
+
 
 const AppSidebar = () => {
   const pathname = usePathname();
+  const { data } = useSession()
   return (
     <Sidebar variant="inset" collapsible="icon">
       <SidebarHeader>
@@ -88,44 +107,33 @@ const AppSidebar = () => {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Applications</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {applications_url.map((item) => {
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={pathname == item.url}>
-                      <Link href={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Transactions</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {transactions_url.map((item) => {
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={pathname == item.url}>
-                      <Link href={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {
+          url.map((i, index) => {
+            return (
+              <SidebarGroup key={index}>
+                <SidebarGroupLabel>{i.category}</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {i.url.map((item) => {
+                      if (item.canAccess.includes(data?.user.role as string)) {
+                        return (
+                          <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton asChild isActive={pathname == item.url}>
+                              <Link href={item.url}>
+                                <item.icon />
+                                <span>{item.title}</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      }
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            )
+          })
+        }
         <SidebarGroup />
       </SidebarContent>
       <SidebarFooter>
@@ -148,7 +156,7 @@ const AppSidebar = () => {
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => signOut()}>
                   <LogOut />
                   <span>Logout</span>
                 </DropdownMenuItem>

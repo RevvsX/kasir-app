@@ -103,6 +103,12 @@ const Index = () => {
     setBarcode("");
   };
 
+  function deleteProduct(id: number){
+    setProducts(products.filter((prev)=>{
+      return prev.id != id
+    }))
+  }
+
   const increaseQuantity = (id: number) => {
     setProducts((prevProducts) =>
       prevProducts.map((p) =>
@@ -309,7 +315,9 @@ const Index = () => {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction>Continue</AlertDialogAction>
+                          <AlertDialogAction asChild>
+                            <Button onClick={()=>deleteProduct(product.id)}>Confirm</Button>
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
