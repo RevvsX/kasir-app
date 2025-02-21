@@ -6,8 +6,8 @@ import EditModal from "./EditModal";
 
 export type Column = {
   id: number;
+  full_name: string;
   username: string;
-  email: string;
   address: string;
   role: string;
   phone_number: string;
@@ -27,6 +27,23 @@ export const columns: ColumnDef<Column>[] = [
         </Button>
       );
     },
+    cell: ({row})=>{
+      return row.index + 1
+    }
+  },
+  {
+    accessorKey: "full_name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Full name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "username",
@@ -37,20 +54,6 @@ export const columns: ColumnDef<Column>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Username
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -86,12 +89,13 @@ export const columns: ColumnDef<Column>[] = [
         <div className="flex gap-2">
           <EditModal
             username={row.getValue("username")}
-            email={row.getValue("email")}
+            full_name={row.getValue("full_name")}
             password=""
             address={row.getValue("address")}
             phone_number={row.getValue("phone_number")}
+            role={row.getValue("role")}
           />
-          <DeleteModal />
+          <DeleteModal id={row.getValue("id")} />
         </div>
       );
     },

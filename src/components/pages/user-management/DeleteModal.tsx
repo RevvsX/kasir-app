@@ -11,15 +11,34 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/router";
 
-export default function DeleteModal() {
+export default function DeleteModal({id}: {id:number}) {
   const { toast } = useToast();
-  const ConfirmDelete = () => {
+  const router = useRouter()
+  const ConfirmDelete = async () => {
+
+    const deleteData = await fetch(`http://localhost:3000/api/crud/user-management/delete/${id}`, {method: "DELETE"})
+
+    const response = await deleteData.json()
+
+    if(!deleteData.ok){
+      toast({
+        title: "Error!",
+        description: JSON.stringify(response.message),
+        duration: 5000
+      })
+
+      return
+    }
+
     toast({
       title: "Success!",
-      description: "User successfully deleted",
+      description: JSON.stringify(response.message),
       duration: 5000,
     });
+
+    router.replace(router.pathname)
   };
   return (
     <AlertDialog>

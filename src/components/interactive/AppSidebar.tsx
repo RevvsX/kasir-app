@@ -144,7 +144,7 @@ const AppSidebar = () => {
                 <SidebarMenuButton>
                   <User2 />
                   <div className="flex flex-col">
-                    <span className="text-nowrap">Remmy Shiranui</span>
+                    <span className="text-nowrap">{data?.user.full_name}</span>
                   </div>
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>

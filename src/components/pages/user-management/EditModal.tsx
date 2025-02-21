@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -19,33 +20,53 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import formschema from "./formschema";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+export const editFormSchema = z.object({
+  full_name: z.string().trim().min(1, "Full name is required"),
+  username: z
+    .string()
+    .trim()
+    .min(4, { message: "Username must be at least 4 characters" }),
+  password: z
+    .string()
+    .trim()
+    .min(4, { message: "Password must be at least 4 characters" })
+    .optional()
+    .or(z.literal("")),
+  role: z.enum(["ADMIN", "OFFICER"]),
+  address: z.string().trim().optional(),
+  phone_number: z
+    .string()
+    .trim()
+    .regex(/^(\+62|0)[0-9]{9,13}$/, {
+      message: "Invalid phone number format (must be 10-14 digits)",
+    })
+    .optional(),
+});
+
 
 const EditModal = ({
+  full_name,
   username,
-  email,
   password,
   address,
   phone_number,
-}: {
-  username: string;
-  email: string;
-  password: string;
-  address: string;
-  phone_number: string;
-}) => {
-  const form = useForm<z.infer<typeof formschema>>({
-    resolver: zodResolver(formschema),
+  role
+}: z.infer<typeof editFormSchema>) => {
+  const form = useForm<z.infer<typeof editFormSchema>>({
+    resolver: zodResolver(editFormSchema),
     defaultValues: {
+      full_name: full_name,
       username: username,
-      email: email,
       password: password,
       address: address,
       phone_number: phone_number,
+      role: role
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formschema>) => {
+  const onSubmit = (values: z.infer<typeof editFormSchema>) => {
     console.log(values);
   };
   return (
@@ -63,6 +84,21 @@ const EditModal = ({
             <div className="flex flex-col md:flex-row gap-2">
               <FormField
                 control={form.control}
+                name="full_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Full name <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="username"
                 render={({ field }) => (
                   <FormItem>
@@ -76,16 +112,22 @@ const EditModal = ({
                   </FormItem>
                 )}
               />
+            </div>
+            <div className="flex flex-col">
               <FormField
                 control={form.control}
-                name="email"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Email <span className="text-red-500">*</span>
+                      Password
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter email" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="Don't fill it in if you don't want to change the password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -95,17 +137,23 @@ const EditModal = ({
             <div className="flex flex-col">
               <FormField
                 control={form.control}
-                name="password"
+                name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter password"
-                        {...field}
-                      />
-                    </FormControl>
+                    <FormLabel>
+                      Select <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="ADMIN">ADMIN</SelectItem>
+                        <SelectItem value="OFFICER">OFFICER</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -139,7 +187,9 @@ const EditModal = ({
                 )}
               />
             </div>
-            <Button type="submit">Submit</Button>
+            <DialogClose asChild>
+              <Button type="submit">Submit</Button>
+            </DialogClose>
           </form>
         </Form>
       </DialogContent>

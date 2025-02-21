@@ -44,6 +44,7 @@ export const authOptions: AuthOptions = {
           phone_number: user.phone_number,
         };
       }
+
       return token;
     },
     async session({ session, token }) {
