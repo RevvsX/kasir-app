@@ -20,8 +20,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import formschema from "./formschema";
+import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/router";
+import { DialogClose } from "@radix-ui/react-dialog";
 
-const EditModal = ({ category_name }: { category_name: string }) => {
+const EditModal = ({ category_name, id }: { category_name: string, id: number }) => {
   const form = useForm<z.infer<typeof formschema>>({
     resolver: zodResolver(formschema),
     defaultValues: {
@@ -29,8 +33,44 @@ const EditModal = ({ category_name }: { category_name: string }) => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formschema>) => {
-    console.log(values);
+  useEffect(() => {
+    form.setValue("category_name", category_name)
+  }, [category_name, form])
+
+  const { toast } = useToast()
+  const router = useRouter()
+  const onSubmit = async (values: z.infer<typeof formschema>) => {
+    const editData = await fetch(`http://localhost:3000/api/crud/category-management/edit/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(values)
+    })
+
+    const response = await editData.json()
+
+    if (!editData.ok) {
+      toast({
+        title: "Error!",
+        description: JSON.stringify(response.message),
+        duration: 5000
+      })
+
+      return
+    }
+
+
+    toast({
+      title: "Success!",
+      description: JSON.stringify(response.message),
+      duration: 5000
+    })
+
+
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query },
+      },
+    );
   };
   return (
     <Dialog>
@@ -61,7 +101,9 @@ const EditModal = ({ category_name }: { category_name: string }) => {
                 )}
               />
             </div>
-            <Button type="submit">Submit</Button>
+            <DialogClose asChild>
+              <Button type="submit">Submit</Button>
+            </DialogClose>
           </form>
         </Form>
       </DialogContent>

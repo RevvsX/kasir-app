@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         res.status(201).json({
             "status": "success",
-            "message": "User data successfully created"
+            "message": "User data successfully edited"
         })
     } catch (error) {
         res.status(500).json({

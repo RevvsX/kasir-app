@@ -94,6 +94,7 @@ export const columns: ColumnDef<Column>[] = [
             address={row.getValue("address")}
             phone_number={row.getValue("phone_number")}
             role={row.getValue("role")}
+            id={row.getValue("id")}
           />
           <DeleteModal id={row.getValue("id")} />
         </div>

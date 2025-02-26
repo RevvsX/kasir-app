@@ -15,9 +15,6 @@ const formschema = z.object({
   phone_number: z
     .string()
     .trim()
-    .regex(/^(\+62|0)[0-9]{9,13}$/, {
-      message: "Invalid phone number format (must be 10-14 digits)",
-    })
     .optional(),
 });
 

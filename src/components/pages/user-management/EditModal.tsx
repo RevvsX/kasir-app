@@ -21,6 +21,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export const editFormSchema = z.object({
   full_name: z.string().trim().min(1, "Full name is required"),
@@ -39,9 +42,6 @@ export const editFormSchema = z.object({
   phone_number: z
     .string()
     .trim()
-    .regex(/^(\+62|0)[0-9]{9,13}$/, {
-      message: "Invalid phone number format (must be 10-14 digits)",
-    })
     .optional(),
 });
 
@@ -52,8 +52,17 @@ const EditModal = ({
   password,
   address,
   phone_number,
-  role
-}: z.infer<typeof editFormSchema>) => {
+  role,
+  id
+}: {
+  full_name: string,
+  username: string,
+  password: string,
+  address: string,
+  phone_number: string,
+  role: "ADMIN" | "OFFICER",
+  id: number
+}) => {
   const form = useForm<z.infer<typeof editFormSchema>>({
     resolver: zodResolver(editFormSchema),
     defaultValues: {
@@ -66,8 +75,49 @@ const EditModal = ({
     },
   });
 
-  const onSubmit = (values: z.infer<typeof editFormSchema>) => {
-    console.log(values);
+  useEffect(()=>{
+    form.setValue("full_name", full_name)
+    form.setValue("username", username)
+    form.setValue("password", password)
+    form.setValue("address", address)
+    form.setValue("phone_number", phone_number)
+    form.setValue("role", role)
+  }, [form, full_name, username, password, address, phone_number, role])
+
+  const {toast} = useToast()
+  const router = useRouter()
+  const onSubmit = async (values: z.infer<typeof editFormSchema>) => {
+    const editData = await fetch(`http://localhost:3000/api/crud/user-management/edit/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(values)
+    })
+
+    const response = await editData.json()
+
+    if (!editData.ok) {
+      toast({
+        title: "Error!",
+        description: JSON.stringify(response.message),
+        duration: 5000
+      })
+
+      return
+    }
+
+
+    toast({
+      title: "Success!",
+      description: JSON.stringify(response.message),
+      duration: 5000
+    })
+
+
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query},
+      },
+    );
   };
   return (
     <Dialog>

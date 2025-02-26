@@ -59,7 +59,6 @@ export function DataTable<TData, TValue>({
     },
   });
 
-
   const pgSize = useMemo(() => [5, 10, 20, 30, 40, 50], []);
 
   useEffect(() => {

@@ -1,9 +1,7 @@
 import {
   ColumnDef,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
@@ -25,29 +23,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { MouseEventHandler, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import CreateModal from "./CreateModal";
+import { useRouter } from "next/router";
+import PaginationComponent from "@/components/partials/PaginationComponent";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pagenumber: string;
+  pagelimit: string;
+  pagecount: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  pagenumber,
+  pagelimit,
+  pagecount
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const router = useRouter()
 
   const table = useReactTable({
     data,
@@ -56,25 +54,62 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
-      columnFilters,
     },
   });
 
-  const pageCount = table.getPageCount();
-  const currentPage = table.getState().pagination.pageIndex + 1;
+  const pgSize = useMemo(() => [5, 10, 20, 30, 40, 50], []);
+
+  useEffect(() => {
+    table.setPageSize(Number(pagelimit))
+    if (!pgSize.includes(parseInt(pagelimit as string))) {
+      router.replace(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, pagelimit: 10, pagenumber },
+        },
+      );
+    }
+  }, [pagelimit, pagenumber, router, pgSize, table]);
+
+  const previous: MouseEventHandler = (e) => {
+    e.preventDefault();
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, pagelimit, pagenumber: parseInt(pagenumber) == 1 ? 1 : parseInt(pagenumber) - 1 },
+      }
+    );
+  }
+
+  const next: MouseEventHandler = (e) => {
+    e.preventDefault();
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, pagelimit, pagenumber: parseInt(pagenumber) + 1 },
+      },
+    );
+  }
 
   return (
     <div>
+      <div className="flex justify-end">
+        <CreateModal />
+      </div>
       <div className="flex flex-col md:flex-row gap-2 justify-between items-center py-4">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
+              router.replace(
+                {
+                  pathname: router.pathname,
+                  query: { ...router.query, pagelimit: value, pagenumber },
+                },
+              );
               table.setPageSize(Number(value));
             }}
           >
@@ -82,7 +117,7 @@ export function DataTable<TData, TValue>({
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[5, 10, 20, 30, 40, 50].map((pageSize) => (
+              {pgSize.map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>
@@ -91,16 +126,15 @@ export function DataTable<TData, TValue>({
           </Select>
         </div>
         <Input
-          placeholder="Filter category..."
-          value={
-            (table.getColumn("category_name")?.getFilterValue() as string) ?? ""
-          }
+          placeholder="Filter category name..."
           onChange={(event) =>
-            table.getColumn("category_name")?.setFilterValue(event.target.value)
+            router.replace({
+              pathname: router.pathname,
+              query: { ...router.query, search: event.target.value, pagelimit, pagenumber }
+            })
           }
           className="max-w-sm"
         />
-        <CreateModal />
       </div>
       <div className="rounded-md border">
         <Table>
@@ -113,9 +147,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -155,49 +189,11 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center justify-between px-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground"></div>
         <div className="flex items-center space-x-6 lg:space-x-8">
-          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
+          <div className="flex w-[100px] items-center justify-center text-sm font-medium text-nowrap">
+            Page {pagenumber} of{" "}
+            {pagecount}
           </div>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    table.previousPage();
-                  }}
-                />
-              </PaginationItem>
-              {[...Array(pageCount)].map((_, index) => {
-                const pageNumber = index + 1;
-                return (
-                  <PaginationItem key={pageNumber}>
-                    <PaginationLink
-                      href="#"
-                      isActive={pageNumber === currentPage}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        table.setPageIndex(index);
-                      }}
-                    >
-                      {pageNumber}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    table.nextPage();
-                  }}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <PaginationComponent next={next} previous={previous} pagenumber={pagenumber}/>
         </div>
       </div>
     </div>

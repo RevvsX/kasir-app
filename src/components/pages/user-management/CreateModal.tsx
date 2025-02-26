@@ -42,16 +42,14 @@ const CreateModal = () => {
   const router = useRouter()
 
   const onSubmit = async (values: z.infer<typeof formschema>) => {
-    const getData = await fetch(`http://localhost:3000/api/crud/user-management/create`, {
+    const createData = await fetch(`http://localhost:3000/api/crud/user-management/create`, {
       method: "POST",
       body: JSON.stringify(values)
     })
 
-    const response = await getData.json()
+    const response = await createData.json()
 
-    console.log(response)
-
-    if (!getData.ok) {
+    if (!createData.ok) {
       toast({
         title: "Error!",
         description: JSON.stringify(response.message),

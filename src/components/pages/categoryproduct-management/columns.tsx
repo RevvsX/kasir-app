@@ -23,6 +23,9 @@ export const columns: ColumnDef<Column>[] = [
         </Button>
       );
     },
+    cell: ({row})=>{
+      return row.index + 1
+    }
   },
   {
     accessorKey: "category_name",
@@ -44,8 +47,8 @@ export const columns: ColumnDef<Column>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex gap-2">
-          <EditModal category_name={row.getValue("category_name")} />
-          <DeleteModal />
+          <EditModal id={row.getValue("id")} category_name={row.getValue("category_name")} />
+          <DeleteModal id={row.getValue("id")} />
         </div>
       );
     },
