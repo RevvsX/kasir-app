@@ -29,6 +29,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import formschema from "./formschema";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { Column } from "../categoryproduct-management/columns";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 const CreateModal = () => {
   const form = useForm<z.infer<typeof formschema>>({
@@ -43,8 +48,61 @@ const CreateModal = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formschema>) => {
-    console.log(values);
+  const { toast } = useToast()
+  const router = useRouter()
+  const [category, setCategory] = useState<Column[]>()
+
+
+  useEffect(() => {
+    const getCategory = async () => {
+      const getData = await fetch(`http://localhost:3000/api/crud/category-management/get_all`,
+        {
+          method: "GET",
+          headers: {
+            accept: "application/json"
+          }
+        }
+      )
+
+      const response = await getData.json()
+
+
+      setCategory(response.data)
+
+
+    }
+
+    getCategory()
+  }, [])
+
+  const onSubmit = async (values: z.infer<typeof formschema>) => {
+    const createData = await fetch(`http://localhost:3000/api/crud/product-management/create`, {
+      method: "POST",
+      body: JSON.stringify(values)
+    })
+
+    const response = await createData.json()
+
+    if (!createData.ok) {
+      toast({
+        title: "Error!",
+        description: JSON.stringify(response.message),
+        duration: 5000
+      })
+
+      return
+    }
+
+
+    toast({
+      title: "Success!",
+      description: JSON.stringify(response.message),
+      duration: 5000
+    })
+
+    form.reset()
+
+    router.replace(router.pathname)
   };
   return (
     <Dialog>
@@ -170,7 +228,13 @@ const CreateModal = () => {
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Category</SelectLabel>
-                          <SelectItem value="Mandi">Mandi</SelectItem>
+                          {
+                            category?.map((element, index) => {
+                              return (
+                                <SelectItem key={index} value={element.id.toString()}>{element.category_name}</SelectItem>
+                              )
+                            })
+                          }
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -179,7 +243,9 @@ const CreateModal = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <DialogClose asChild>
+              <Button type="submit">Submit</Button>
+            </DialogClose>
           </form>
         </Form>
       </DialogContent>

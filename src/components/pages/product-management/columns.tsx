@@ -10,7 +10,7 @@ export type Column = {
   purchase_price: string;
   selling_price: string;
   stock: string;
-  category: string;
+  category_name: string;
   barcode: string;
 };
 
@@ -28,6 +28,9 @@ export const columns: ColumnDef<Column>[] = [
         </Button>
       );
     },
+    cell: ({row})=>{
+      return row.index + 1
+    }
   },
   {
     accessorKey: "product_name",
@@ -86,7 +89,7 @@ export const columns: ColumnDef<Column>[] = [
     },
   },
   {
-    accessorKey: "category",
+    accessorKey: "category.category_name",
     header: ({ column }) => {
       return (
         <Button
@@ -114,7 +117,7 @@ export const columns: ColumnDef<Column>[] = [
             purchase_price={row.getValue("purchase_price")}
             selling_price={row.getValue("selling_price")}
             stock={row.getValue("stock")}
-            category={row.getValue("category")}
+            category={row.getValue("category_category_name")}
             barcode={row.getValue("barcode")}
           />
           <DeleteModal />
