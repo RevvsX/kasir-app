@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try{
         const prisma = new PrismaClient()
         
-        await prisma.category.delete({where: {
+        await prisma.product.delete({where: {
             id: parseInt(req.query.id as string)
         }})
 

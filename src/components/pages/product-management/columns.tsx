@@ -14,6 +14,8 @@ export type Column = {
   barcode: string;
 };
 
+
+
 export const columns: ColumnDef<Column>[] = [
   {
     accessorKey: "id",
@@ -28,7 +30,7 @@ export const columns: ColumnDef<Column>[] = [
         </Button>
       );
     },
-    cell: ({row})=>{
+    cell: ({ row }) => {
       return row.index + 1
     }
   },
@@ -89,7 +91,7 @@ export const columns: ColumnDef<Column>[] = [
     },
   },
   {
-    accessorKey: "category.category_name",
+    accessorKey: "category",
     header: ({ column }) => {
       return (
         <Button
@@ -101,6 +103,9 @@ export const columns: ColumnDef<Column>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      return (row.getValue("category") as { category_name: string }).category_name
+    }
   },
   {
     accessorKey: "barcode",
@@ -113,14 +118,15 @@ export const columns: ColumnDef<Column>[] = [
       return (
         <div className="flex gap-2">
           <EditModal
+            id={row.getValue("id")}
             product_name={row.getValue("product_name")}
             purchase_price={row.getValue("purchase_price")}
             selling_price={row.getValue("selling_price")}
             stock={row.getValue("stock")}
-            category={row.getValue("category_category_name")}
+            category={(row.getValue("category") as { id: number }).id.toString()}
             barcode={row.getValue("barcode")}
           />
-          <DeleteModal />
+          <DeleteModal id={row.getValue("id")} />
         </div>
       );
     },

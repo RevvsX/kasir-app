@@ -29,6 +29,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import formschema from "./formschema";
+import { useCategoryProductContext } from "./ListCategory";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useToast } from "@/hooks/use-toast";
+import { DialogClose } from "@radix-ui/react-dialog";
+
 
 const EditModal = ({
   product_name,
@@ -37,6 +43,7 @@ const EditModal = ({
   stock,
   category,
   barcode,
+  id
 }: {
   product_name: string;
   purchase_price: string;
@@ -44,21 +51,65 @@ const EditModal = ({
   stock: string;
   category: string;
   barcode: string;
+  id: number;
 }) => {
   const form = useForm<z.infer<typeof formschema>>({
     resolver: zodResolver(formschema),
     defaultValues: {
-      product_name: product_name,
-      purchase_price: purchase_price,
-      selling_price: selling_price,
-      stock: stock,
-      category: category,
-      barcode: barcode,
+      product_name: "",
+      purchase_price: "",
+      selling_price: "",
+      stock: 0,
+      category: "",
+      barcode: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formschema>) => {
-    console.log(values);
+  useEffect(() => {
+    form.setValue("product_name", product_name)
+    form.setValue("purchase_price", purchase_price)
+    form.setValue("selling_price", selling_price)
+    form.setValue("stock", parseInt(stock))
+    form.setValue("category", category.toString())
+    form.setValue("barcode", barcode)
+  }, [form, product_name, purchase_price, selling_price, stock, category, barcode])
+
+  const categoryList = useCategoryProductContext()
+
+  const { toast } = useToast()
+  const router = useRouter()
+  const onSubmit = async (values: z.infer<typeof formschema>) => {
+    const editData = await fetch(`http://localhost:3000/api/crud/product-management/edit/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(values)
+    })
+
+    const response = await editData.json()
+
+    if (!editData.ok) {
+      toast({
+        title: "Error!",
+        description: JSON.stringify(response.message),
+        duration: 5000
+      })
+
+      return
+    }
+
+
+    toast({
+      title: "Success!",
+      description: JSON.stringify(response.message),
+      duration: 5000
+    })
+
+
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query },
+      },
+    );
   };
   return (
     <Dialog>
@@ -184,7 +235,13 @@ const EditModal = ({
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Category</SelectLabel>
-                          <SelectItem value="Mandi">Mandi</SelectItem>
+                          {
+                            categoryList.map((element, index) => {
+                              return (
+                                <SelectItem key={index} value={element.id.toString()}>{element.category_name}</SelectItem>
+                              )
+                            })
+                          }
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -193,7 +250,9 @@ const EditModal = ({
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <DialogClose asChild>
+              <Button type="submit">Submit</Button>
+            </DialogClose>
           </form>
         </Form>
       </DialogContent>

@@ -31,9 +31,8 @@ import { z } from "zod";
 import formschema from "./formschema";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { Column } from "../categoryproduct-management/columns";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { useCategoryProductContext } from "./ListCategory";
 
 const CreateModal = () => {
   const form = useForm<z.infer<typeof formschema>>({
@@ -42,7 +41,7 @@ const CreateModal = () => {
       product_name: "",
       purchase_price: "",
       selling_price: "",
-      stock: "",
+      stock: 0,
       category: "",
       barcode: "",
     },
@@ -50,30 +49,8 @@ const CreateModal = () => {
 
   const { toast } = useToast()
   const router = useRouter()
-  const [category, setCategory] = useState<Column[]>()
-
-
-  useEffect(() => {
-    const getCategory = async () => {
-      const getData = await fetch(`http://localhost:3000/api/crud/category-management/get_all`,
-        {
-          method: "GET",
-          headers: {
-            accept: "application/json"
-          }
-        }
-      )
-
-      const response = await getData.json()
-
-
-      setCategory(response.data)
-
-
-    }
-
-    getCategory()
-  }, [])
+  
+  const category = useCategoryProductContext()
 
   const onSubmit = async (values: z.infer<typeof formschema>) => {
     const createData = await fetch(`http://localhost:3000/api/crud/product-management/create`, {

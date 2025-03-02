@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try{
         const prisma = new PrismaClient()
 
-        const categories = await prisma.category.findMany({orderBy: {id: "desc"}})
+        const categories = await prisma.category.findMany({select: {id: true, category_name: true},orderBy: {id: "desc"}})
 
         res.status(200).json({
             "status": "success",

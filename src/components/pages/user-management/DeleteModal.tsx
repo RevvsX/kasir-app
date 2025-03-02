@@ -38,7 +38,12 @@ export default function DeleteModal({id}: {id:number}) {
       duration: 5000,
     });
 
-    router.replace(router.pathname)
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query },
+      },
+    );
   };
   return (
     <AlertDialog>
