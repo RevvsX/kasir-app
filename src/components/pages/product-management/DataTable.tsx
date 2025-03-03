@@ -193,7 +193,7 @@ export function DataTable<TData, TValue>({
             Page {pagenumber} of{" "}
             {pagecount}
           </div>
-          <PaginationComponent next={next} previous={previous} pagenumber={pagenumber}/>
+          <PaginationComponent totalpage={pagecount} next={next} previous={previous} pagenumber={pagenumber}/>
         </div>
       </div>
     </div>
