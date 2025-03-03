@@ -50,9 +50,12 @@ const PaginationComponent = ({
                 {
                     (parseInt(totalpage) > 1 && totalpage != pagenumber) ?
                         <PaginationContent>
-                            <PaginationItem>
-                                <PaginationEllipsis />
-                            </PaginationItem>
+                            {
+                                (parseInt(totalpage) - 1 != parseInt(pagenumber)) ?
+                                    <PaginationItem>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>:""
+                            }
                             <PaginationItem>
                                 <PaginationLink href='#' onClick={(e) => goTo(e, totalpage)}>{totalpage}</PaginationLink>
                             </PaginationItem>
