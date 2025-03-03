@@ -28,7 +28,7 @@ export const authOptions: AuthOptions = {
           throw new Error("User not found")
         }
 
-        return { id: user.id.toString(), username: user.username, full_name: user.full_name, address: user.address, role: user.role, phone_number: user.phone_number }
+        return { id: user.id.toString(), username: user.username, full_name: user.full_name, address: user.address as string, role: user.role, phone_number: user.phone_number as string }
       },
     }),
   ],
