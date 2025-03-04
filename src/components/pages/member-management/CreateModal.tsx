@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -20,6 +21,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import formschema from "./formschema";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/router";
 
 const CreateModal = () => {
   const form = useForm<z.infer<typeof formschema>>({
@@ -31,8 +34,37 @@ const CreateModal = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formschema>) => {
-    console.log(values);
+  const { toast } = useToast()
+  const router = useRouter()
+
+  const onSubmit = async (values: z.infer<typeof formschema>) => {
+    const createData = await fetch(`http://localhost:3000/api/crud/member-management/create`, {
+      method: "POST",
+      body: JSON.stringify(values)
+    })
+
+    const response = await createData.json()
+
+    if (!createData.ok) {
+      toast({
+        title: "Error!",
+        description: JSON.stringify(response.message),
+        duration: 5000
+      })
+
+      return
+    }
+
+
+    toast({
+      title: "Success!",
+      description: JSON.stringify(response.message),
+      duration: 5000
+    })
+
+    form.reset()
+
+    router.replace(router.pathname)
   };
   return (
     <Dialog>
@@ -98,7 +130,10 @@ const CreateModal = () => {
               )}
             />
 
-            <Button type="submit">Submit</Button>
+            <DialogClose asChild>
+              <Button type="submit">Submit</Button>
+            </DialogClose>
+
           </form>
         </Form>
       </DialogContent>

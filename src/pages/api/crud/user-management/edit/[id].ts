@@ -30,9 +30,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if(password != ""){
 
             const hashedPassword = await bcrypt.hash(password as string, 8)
-            await prisma.user.update({ where: {id: parseInt(req.query.id as string)}, data: { full_name: full_name, username: username, password: hashedPassword, role: role, address: address as string, phone_number: phone_number as string } })
+            await prisma.user.update({ where: {id: parseInt(req.query.id as string)}, data: { full_name: full_name, username: username, password: hashedPassword, role: role, address: address as string, phone_number: phone_number as string, updated_at: new Date() } })
         }else{
-            await prisma.user.update({where: {id: parseInt(req.query.id as string)}, data: { full_name: full_name, username: username, role: role, address: address as string, phone_number: phone_number as string }})
+            await prisma.user.update({where: {id: parseInt(req.query.id as string)}, data: { full_name: full_name, username: username, role: role, address: address as string, phone_number: phone_number as string, updated_at: new Date() }})
         }
 
 

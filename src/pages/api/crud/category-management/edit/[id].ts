@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         
         
-        await prisma.category.update({where: {id: parseInt(req.query.id as string)}, data: { category_name: category_name }})
+        await prisma.category.update({where: {id: parseInt(req.query.id as string)}, data: { category_name: category_name, updated_at: new Date() }})
 
 
         res.status(201).json({

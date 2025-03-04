@@ -1,30 +1,42 @@
 import { columns } from "@/components/pages/member-management/columns";
 import { DataTable } from "@/components/pages/member-management/DataTable";
 import AppLayout from "@/layout/AppLayout";
-import { InferGetServerSidePropsType } from "next";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 
-export function getServerSideProps() {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+
+  const { pagenumber = "1", pagelimit = "10", search = "" } = context.query
+
+  const fetching = await fetch(`${process.env.APP_URL}/api/crud/member-management?pagelimit=${pagelimit}&pagenumber=${pagenumber}&search=${search}`, {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      authorization: `Bearer ${context.req.cookies["next-auth.session-token"]}`
+    },
+  })
+
+  const response = await fetching.json()
+
   return {
     props: {
-      data: [
-        {
-          id: 1,
-          name: "Aldon",
-          address: "Bangunjiwo",
-          phone_number: "081982773628",
-        },
-      ],
+      data: response.data,
+      currentPageNumber: pagenumber,
+      currentPageLimit: pagelimit,
+      pagecount: response.meta.pagecount
     },
   };
 }
 
 const ProductManagement = ({
   data,
+  currentPageLimit,
+  currentPageNumber,
+  pagecount
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AppLayout>
       <div className="max">
-        <DataTable columns={columns} data={data} />
+        <DataTable pagecount={pagecount} pagelimit={currentPageLimit as string} pagenumber={currentPageNumber as string} columns={columns} data={data} />
       </div>
     </AppLayout>
   );

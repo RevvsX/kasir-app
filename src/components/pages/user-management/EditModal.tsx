@@ -25,7 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-const editFormSchema = z.object({
+export const editFormSchema = z.object({
   full_name: z.string().trim().min(1, "Full name is required"),
   username: z
     .string()
