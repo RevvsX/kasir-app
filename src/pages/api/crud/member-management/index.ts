@@ -29,10 +29,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         name: {
                             contains: search as string
                         },
-                    }, {
-                        id: {
-                            equals: parseInt(search as string)
-                        }
                     }]
                 },
                 orderBy: { id: "desc" }
@@ -43,9 +39,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     OR: [
                         {
                             name: { contains: search as string }
-                        },
-                        {
-                            id: { equals: parseInt(search as string) }
                         }
                     ]
                 }

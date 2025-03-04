@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>({
           </Select>
         </div>
         <Input
-          placeholder="Filter member name or id..."
+          placeholder="Filter member name..."
           onChange={(event) =>
             router.replace({
               pathname: router.pathname,

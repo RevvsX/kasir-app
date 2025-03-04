@@ -36,7 +36,7 @@ const ProductManagement = ({
   return (
     <AppLayout>
       <div className="max">
-        <DataTable pagecount={pagecount} pagelimit={currentPageLimit as string} pagenumber={currentPageNumber as string} columns={columns} data={data} />
+        <DataTable pagecount={pagecount as string} pagelimit={currentPageLimit as string} pagenumber={currentPageNumber as string} columns={columns} data={data} />
       </div>
     </AppLayout>
   );
