@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
 
-        await prisma.product.create({data: {product_name: product_name, barcode: barcode, purchase_price: purchase_price, selling_price: selling_price, stock: parseInt(stock),category: {connect: {id: parseInt(category)}}}})
+        await prisma.product.create({data: {product_name: product_name, barcode: barcode, purchase_price: purchase_price, selling_price: selling_price, stock: stock,category: {connect: {id: parseInt(category)}}}})
 
         res.status(201).json({
             "status": "success",

@@ -30,11 +30,16 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 
 type Product = {
   id: number;
-  name: string;
-  price: number;
-  totalprice: number;
+  product_name: string;
+  purchase_price: string;
+  selling_price: string;
+  stock: number;
+  barcode: string;
   quantity: number;
+  total_price: number;
 };
+
+type MemberType = { name: string; code: number }
 
 const Index = () => {
   const { toast } = useToast();
@@ -44,59 +49,67 @@ const Index = () => {
   const [isMember, setIsMember] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [barcode, setBarcode] = useState("");
+  const [memberId, setMemberId] = useState("")
   const [totalHarga, setTotalHarga] = useState(0);
   const [totalHargaFix, setTotalHargaFix] = useState(0);
 
-  const productData: Product[] = [
-    { id: 1, name: "Shampo", price: 3000, totalprice: 3000, quantity: 1 },
-    { id: 2, name: "Sabun", price: 2500, totalprice: 2500, quantity: 1 },
-  ];
-  const memberData = {
-    name: "Remmy shiranui",
-    code: 67238,
-  };
+  const [member, setMember] = useState<MemberType[]>([]);
 
-  const [member, setMember] = useState<{ name: string; code: number }[]>([]);
-
-  const memberSearch = (e: FormEvent) => {
+  const memberSearch = async (e: FormEvent) => {
     e.preventDefault();
 
-    setMember([memberData]);
+    const getData = await fetch(`/api/crud/member-management/get/${memberId}`)
+
+    const responseJson = await getData.json()
+    const response: MemberType = responseJson.data
+
+    if(!response){
+      return toast({
+        title: "Member not found"
+      })
+    }
+
+    setMember([response]);
   };
 
   const deleteMember = () => {
     setMember([]);
   };
 
-  const addProductByBarcode = (e: FormEvent) => {
+  const addProductByBarcode = async (e: FormEvent) => {
     e.preventDefault();
 
-    const foundProduct = productData.find(
-      (product) => product.id === parseInt(barcode)
-    );
+    const foundProduct = await fetch(`http://localhost:3000/api/crud/product-management/get/${barcode}`, {
+      method: "GET",
+      headers: {accept: "application/json"}
+    })
 
-    if (!foundProduct)
+    const responseJson = await foundProduct.json()
+
+    const response: Product = responseJson.data
+
+    if (!response)
       return toast({
         title: "Product not found",
       });
 
     setProducts((prevProducts) => {
       const existingProduct = prevProducts.find(
-        (p) => p.id === foundProduct.id
+        (p) => p.id === response.id
       );
 
       if (existingProduct) {
         return prevProducts.map((p) =>
-          p.id === foundProduct.id
+          p.id === response.id
             ? {
                 ...p,
                 quantity: p.quantity + 1,
-                totalprice: p.price * (p.quantity + 1),
+                total_price: parseInt(p.selling_price) * (p.quantity + 1),
               }
             : p
         );
       } else {
-        return [...prevProducts, { ...foundProduct, quantity: 1 }];
+        return [...prevProducts, { ...response, quantity: 1, total_price:  parseInt(response.selling_price)}];
       }
     });
 
@@ -116,7 +129,7 @@ const Index = () => {
           ? {
               ...p,
               quantity: p.quantity + 1,
-              totalprice: p.price * (p.quantity + 1),
+              total_price: parseInt(p.selling_price) * (p.quantity + 1),
             }
           : p
       )
@@ -131,7 +144,7 @@ const Index = () => {
             ? {
                 ...p,
                 quantity: Math.max(1, p.quantity - 1),
-                totalprice: Math.max(p.price, p.price * (p.quantity - 1)),
+                total_price: Math.max(parseInt(p.selling_price), parseInt(p.selling_price) * (p.quantity - 1)),
               }
             : p
         )
@@ -141,7 +154,7 @@ const Index = () => {
 
   const countTotalPrice = useCallback(() => {
     let totalHarga = products.reduce(
-      (prev, current) => prev + current.totalprice,
+      (prev, current) => prev + current.total_price,
       0
     );
 
@@ -210,13 +223,13 @@ const Index = () => {
           </div>
           <div className="w-full border-t my-2"></div>
           <div
-            className={`flex justify-between w-full text-sm items-center gap-2 my-2 ${
+            className={`flex flex-col justify-between w-full text-sm items-center gap-2 my-2 ${
               isMember ? "" : "hidden"
             }`}
           >
             <span>Member</span>
             {member.length != 0 ? (
-              <div className="flex items-end gap-2 flex-col">
+              <div className="flex items-center gap-2 shadow-md border w-full justify-between p-2">
                 <span className="text-nowrap overflow-hidden text-ellipsis">
                   {member[0].name}
                 </span>
@@ -244,6 +257,8 @@ const Index = () => {
                       <Input
                         required
                         className="w-full"
+                        value={memberId}
+                        onChange={(e)=>setMemberId(e.target.value)}
                         placeholder="Member code..."
                       />
                       <Button type="submit">
@@ -296,7 +311,7 @@ const Index = () => {
               <Card key={product.id} className="w-full">
                 <CardHeader>
                   <CardTitle className="flex justify-between items-center">
-                    <span>{product.name}</span>
+                    <span>{product.product_name}</span>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="destructive">
@@ -326,7 +341,7 @@ const Index = () => {
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">
-                      Rp.{product.totalprice.toLocaleString()}
+                      Rp.{product.total_price.toLocaleString()}
                     </span>
                     <div className="flex items-center gap-2">
                       <Button
