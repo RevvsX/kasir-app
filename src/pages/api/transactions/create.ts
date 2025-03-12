@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sub_total: el.total_price,
         }));
 
-        await prisma.$transaction(async (tx) => {
+        const transaction = await prisma.$transaction(async (tx) => {
             const transaction = await tx.transaction.create({
                 data: {
                     change,
@@ -76,6 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(201).json({
             status: "success",
             message: "Transaction data successfully created",
+            data: transaction,
         });
     } catch (error) {
         return res.status(500).json({

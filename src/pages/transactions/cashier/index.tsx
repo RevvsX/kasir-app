@@ -45,7 +45,7 @@ type Product = {
   total_price: number;
 };
 
-type MemberType = { id: number; name: string; address: string; phone_number: string  }
+type MemberType = { id: number; name: string; address: string; phone_number: string }
 
 const Index = () => {
 
@@ -58,7 +58,7 @@ const Index = () => {
   const [isMember, setIsMember] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [barcode, setBarcode] = useState("");
-  const [quantity, setQuantity]= useState<number>(1)
+  const [quantity, setQuantity] = useState<number>(1)
   const [memberId, setMemberId] = useState("")
   const [totalHarga, setTotalHarga] = useState(0);
   const [totalHargaFix, setTotalHargaFix] = useState(0);
@@ -84,7 +84,7 @@ const Index = () => {
     form.setValue("total_price", totalHarga);
     form.setValue("fixed_total_price", totalHargaFix);
     form.setValue("discount", member.length > 0 && isMember ? diskon : 0);
-    form.setValue("memberId", member.length > 0 && isMember ? member[0].id: null)
+    form.setValue("memberId", member.length > 0 && isMember ? member[0].id : null)
     form.setValue("change", change);
     form.setValue("products", products);
   }, [form, totalHarga, totalHargaFix, isMember, member, diskon, change, products]);
@@ -154,13 +154,13 @@ const Index = () => {
             p.id === response.id
               ? {
                 ...p,
-                quantity: Math.max(1, Math.min(quantity? p.quantity + quantity : p.quantity + 1, p.stock)),
-                total_price: parseInt(p.selling_price) * (Math.max(1, Math.min(quantity? p.quantity + quantity : p.quantity + 1, p.stock))),
+                quantity: Math.max(1, Math.min(quantity ? p.quantity + quantity : p.quantity + 1, p.stock)),
+                total_price: parseInt(p.selling_price) * (Math.max(1, Math.min(quantity ? p.quantity + quantity : p.quantity + 1, p.stock))),
               }
               : p
           );
         } else {
-          return [...prevProducts, { ...response, quantity: (quantity)?Math.max(1, Math.min(quantity, response.stock)):1, total_price: (quantity)? parseInt(response.selling_price) * (Math.max(1, Math.min(quantity, response.stock))) : parseInt(response.selling_price) }];
+          return [...prevProducts, { ...response, quantity: (quantity) ? Math.max(1, Math.min(quantity, response.stock)) : 1, total_price: (quantity) ? parseInt(response.selling_price) * (Math.max(1, Math.min(quantity, response.stock))) : parseInt(response.selling_price) }];
         }
       });
 
@@ -256,202 +256,204 @@ const Index = () => {
 
     setProducts([])
 
-    router.replace(router.pathname)
+    router.push(`/transactions/cashier/invoice/${response.data.id}`)
   }
 
   return (
     <AppLayout>
       <div className="flex gap-2 w-full">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="w-1/4 h-[85vh] shadow-md border flex flex-col p-4">
-            <div>
-              <h1 className="font-bold">Total</h1>
-              <div className="flex justify-between w-full text-sm items-center">
-                <span className="text-nowrap">
-                  Total Price(IDR)
+        <div className="w-1/4 h-[85vh] shadow-md border flex flex-col p-4">
+          <div className="flex justify-between text-sm items-center">
+            <span>Is member</span>
+            <span>
+              <Switch
+                id="is-member"
+                checked={isMember}
+                onCheckedChange={setIsMember}
+              />
+            </span>
+          </div>
+          <div className="w-full border-t my-2"></div>
+          <div
+            className={`flex flex-col justify-between w-full text-sm items-center gap-2 my-2 ${isMember ? "" : "hidden"
+              }`}
+          >
+            <span>Member</span>
+            {member.length != 0 ? (
+              <div className="flex items-center gap-2 shadow-md border w-full justify-between p-2">
+                <span className="text-nowrap overflow-hidden text-ellipsis">
+                  {member[0].name}
                 </span>
-                <FormField
-                  control={form.control}
-                  name="total_price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          className="border-none shadow-none text-end"
-                          disabled
-                          {...field}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
+                <Button onClick={deleteMember}>
+                  <Trash />
+                </Button>
               </div>
-              <div className="flex justify-between w-full text-sm items-center">
-                <span>Discount(%)</span>
-                <FormField
-                  control={form.control}
-                  name="discount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          className="border-none shadow-none text-end"
-                          disabled
-                          {...field}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="flex justify-between w-full text-sm items-center">
-                <span>
-                  PPN(%)
-                </span>
-                <FormField
-                  control={form.control}
-                  name="ppn"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          className="border-none shadow-none text-end"
-                          disabled
-                          {...field}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="flex justify-between w-full text-sm items-center">
-                <span className="text-nowrap">
-                  Fixed Total Price(IDR)
-                </span>
-                <FormField
-                  control={form.control}
-                  name="fixed_total_price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          className="border-none shadow-none text-end"
-                          disabled
-                          {...field}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <h1 className="font-bold">Payment</h1>
-              <div className="flex justify-between w-full text-sm items-center">
-                <span>Is member</span>
-                <span>
-                  <Switch
-                    id="is-member"
-                    checked={isMember}
-                    onCheckedChange={setIsMember}
-                  />
-                </span>
-              </div>
-              <div className="w-full border-t my-2"></div>
-              <div
-                className={`flex flex-col justify-between w-full text-sm items-center gap-2 my-2 ${isMember ? "" : "hidden"
-                  }`}
-              >
-                <span>Member</span>
-                {member.length != 0 ? (
-                  <div className="flex items-center gap-2 shadow-md border w-full justify-between p-2">
-                    <span className="text-nowrap overflow-hidden text-ellipsis">
-                      {member[0].name}
-                    </span>
-                    <Button onClick={deleteMember}>
-                      <Trash />
-                    </Button>
+            ) : (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant={"outline"}>Select member</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Select member</DialogTitle>
+                    <DialogDescription>
+                      select a registered member
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex items-center space-x-2">
+                    <form
+                      onSubmit={memberSearch}
+                      className="flex gap-2 items-center w-full"
+                    >
+                      <Input
+                        required
+                        className="w-full"
+                        value={memberId}
+                        onChange={(e) => setMemberId(e.target.value)}
+                        placeholder="Member code..."
+                      />
+                      <Button type="submit">
+                        <Search />
+                      </Button>
+                    </form>
                   </div>
-                ) : (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant={"outline"}>Select member</Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Select member</DialogTitle>
-                        <DialogDescription>
-                          select a registered member
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="flex items-center space-x-2">
-                        <form
-                          onSubmit={memberSearch}
-                          className="flex gap-2 items-center w-full"
-                        >
+                  <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild>
+                      <Button type="button" variant="secondary">
+                        Close
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div>
+                <h1 className="font-bold">Total</h1>
+                <div className="flex justify-between w-full text-sm items-center">
+                  <span className="text-nowrap">
+                    Total Price(IDR)
+                  </span>
+                  <FormField
+                    control={form.control}
+                    name="total_price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
                           <Input
-                            required
-                            className="w-full"
-                            value={memberId}
-                            onChange={(e) => setMemberId(e.target.value)}
-                            placeholder="Member code..."
+                            className="border-none shadow-none text-end"
+                            disabled
+                            {...field}
                           />
-                          <Button type="submit">
-                            <Search />
-                          </Button>
-                        </form>
-                      </div>
-                      <DialogFooter className="sm:justify-start">
-                        <DialogClose asChild>
-                          <Button type="button" variant="secondary">
-                            Close
-                          </Button>
-                        </DialogClose>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                )}
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex justify-between w-full text-sm items-center">
+                  <span>Discount(%)</span>
+                  <FormField
+                    control={form.control}
+                    name="discount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            className="border-none shadow-none text-end"
+                            disabled
+                            {...field}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex justify-between w-full text-sm items-center">
+                  <span>
+                    PPN(%)
+                  </span>
+                  <FormField
+                    control={form.control}
+                    name="ppn"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            className="border-none shadow-none text-end"
+                            disabled
+                            {...field}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex justify-between w-full text-sm items-center">
+                  <span className="text-nowrap">
+                    Fixed Total Price(IDR)
+                  </span>
+                  <FormField
+                    control={form.control}
+                    name="fixed_total_price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            className="border-none shadow-none text-end"
+                            disabled
+                            {...field}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <h1 className="font-bold">Payment</h1>
+                <div className="flex justify-between w-full text-sm items-center gap-3">
+                  <span>Paid(IDR)</span>
+                  <FormField
+                    control={form.control}
+                    name="paid"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input className="text-end" placeholder="0" type="number" {...field} />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex justify-between w-full text-sm items-center gap-3">
+                  <span>Change(IDR)</span>
+                  <FormField
+                    control={form.control}
+                    name="change"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            className="border-none shadow-none text-end"
+                            disabled
+                            {...field}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <Button>Submit</Button>
               </div>
-              <div className="flex justify-between w-full text-sm items-center gap-3">
-                <span>Paid(IDR)</span>
-                <FormField
-                  control={form.control}
-                  name="paid"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input className="text-end" placeholder="0" type="number" {...field} />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="flex justify-between w-full text-sm items-center gap-3">
-                <span>Change(IDR)</span>
-                <FormField
-                  control={form.control}
-                  name="change"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          className="border-none shadow-none text-end"
-                          disabled
-                          {...field}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <Button>Submit</Button>
-            </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        </div>
         <div className="w-3/4 h-[85vh] shadow-md border">
           <form
             className="flex items-center mb-4"
@@ -463,7 +465,7 @@ const Index = () => {
               required
               onChange={(e) => setBarcode(e.target.value)}
             />
-            <Input type="number" value={quantity} onChange={(e)=>setQuantity(parseInt(e.target.value))} placeholder="Product Quantity"/>
+            <Input type="number" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} placeholder="Product Quantity" />
             <Button type="submit">
               <Search />
             </Button>

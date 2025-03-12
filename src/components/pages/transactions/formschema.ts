@@ -7,7 +7,7 @@ const formschema = z.object({
   fixed_total_price: z.coerce.number().positive().min(1, "Fixed total price is required"),
   memberId: z.coerce.number().nullable(),
   paid: z.coerce.number().positive().min(1, "Money paid is required"),
-  change: z.coerce.number(),
+  change: z.coerce.number().positive().min(1),
   products: z.array(
     z.object({
       id: z.number(),
