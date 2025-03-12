@@ -28,7 +28,7 @@ export const authOptions: AuthOptions = {
           throw new Error("User not found")
         }
 
-        return { id: user.id.toString(), username: user.username, full_name: user.full_name, address: user.address as string, role: user.role, phone_number: user.phone_number as string }
+        return { id: user.id, username: user.username, full_name: user.full_name, address: user.address as string, role: user.role, phone_number: user.phone_number as string }
       },
     }),
   ],
@@ -49,7 +49,7 @@ export const authOptions: AuthOptions = {
     },
     async session({ session, token }) {
       session.user = {
-        id: token.id as string,
+        id: token.id as number,
         username: token.username as string,
         full_name: token.full_name as string,
         address: token.address as string,

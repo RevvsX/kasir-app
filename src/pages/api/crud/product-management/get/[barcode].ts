@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const barcode = req.query.barcode
 
 
-        const getData = await prisma.product.findFirst({where: {barcode: {equals: barcode as string}}})
+        const getData = await prisma.product.findFirst({where: {barcode: {equals: barcode as string}, stock: {not: 0}}})
         
         if(getData){
             res.status(200).json({
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }else{
             res.status(404).json({
                 "status" : "error",
-                "message" : "Product not found"
+                "message" : "Product not found or out of stock"
             })
         }
         
