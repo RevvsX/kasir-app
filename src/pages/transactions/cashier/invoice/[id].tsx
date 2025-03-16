@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button'
 import AppLayout from '@/layout/AppLayout'
-import { Printer } from 'lucide-react'
+import { ArrowLeft, Printer } from 'lucide-react'
 import { GetServerSidePropsContext } from 'next'
+import { useRouter } from 'next/router'
 import { useRef } from 'react'
 
 type InvoiceType = {
@@ -54,6 +55,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 const Invoice = ({ data }: { data: InvoiceType }) => {
     const printRef = useRef<HTMLDivElement>(null);
+    const router = useRouter()
 
     const handlePrint = () => {
         if (printRef.current) {
@@ -125,9 +127,12 @@ const Invoice = ({ data }: { data: InvoiceType }) => {
                     <div className="text-center text-xs">Thank youuuuuuu:)</div>
                 </div>
 
-                <div>
+                <div className='flex flex-col gap-2'>
                     <Button onClick={handlePrint}>
                         <Printer className="mr-2" /> Print
+                    </Button>
+                    <Button onClick={()=>router.back()}>
+                        <ArrowLeft/> Back
                     </Button>
                 </div>
             </div>
