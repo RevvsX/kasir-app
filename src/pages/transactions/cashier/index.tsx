@@ -53,8 +53,7 @@ const Index = () => {
   const { toast } = useToast();
   const router = useRouter()
 
-  const ppn = 11;
-  const diskon = 15;
+  const diskon = 5;
   const [isMember, setIsMember] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [barcode, setBarcode] = useState("");
@@ -71,7 +70,6 @@ const Index = () => {
     defaultValues: {
       total_price: 0,
       discount: 0,
-      ppn: ppn,
       fixed_total_price: 0,
       memberId: null,
       paid: 0,
@@ -217,9 +215,8 @@ const Index = () => {
       totalHarga = totalHarga - totalHarga * (diskon / 100);
     }
 
-    totalHarga = totalHarga + totalHarga * (ppn / 100);
 
-    setTotalHargaFix(Math.floor(totalHarga));
+    setTotalHargaFix(totalHarga);
   }, [products, isMember, member]);
 
   useEffect(() => {
@@ -358,27 +355,6 @@ const Index = () => {
                   <FormField
                     control={form.control}
                     name="discount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            className="border-none shadow-none text-end"
-                            disabled
-                            {...field}
-                          />
-                        </FormControl>
-                        {/* <FormMessage /> */}
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="flex justify-between w-full text-sm items-center">
-                  <span>
-                    PPN(%)
-                  </span>
-                  <FormField
-                    control={form.control}
-                    name="ppn"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>

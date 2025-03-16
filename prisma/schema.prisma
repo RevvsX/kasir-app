@@ -70,7 +70,6 @@ model Transaction {
   fixed_total_price Decimal
   money_paid        Decimal
   change            Decimal
-  ppn               Decimal
   userId            Int
   memberId          Int?
   user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -28,7 +28,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             fixed_total_price,
             memberId,
             paid,
-            ppn,
             products,
             total_price,
         } = formschema.parse(JSON.parse(req.body));
@@ -52,7 +51,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     fixed_total_price,
                     memberId,
                     money_paid: paid,
-                    ppn,
                     total_price,
                     userId: session?.user.id as number,
                     TransactionDetail: {

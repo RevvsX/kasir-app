@@ -3,7 +3,6 @@ import { z } from "zod";
 const formschema = z.object({
   total_price: z.coerce.number().positive().min(1, "Total price is required"),
   discount: z.coerce.number(),
-  ppn: z.coerce.number().positive().min(1, "Ppn is required"),
   fixed_total_price: z.coerce.number().positive().min(1, "Fixed total price is required"),
   memberId: z.coerce.number().nullable(),
   paid: z.coerce.number().positive().min(1, "Money paid is required"),

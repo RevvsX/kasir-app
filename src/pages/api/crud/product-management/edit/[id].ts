@@ -16,9 +16,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const prisma = new PrismaClient()
 
+        const fixed_selling_price = parseInt(selling_price) + parseInt(selling_price) * (11 / 100)
         
-        
-        await prisma.product.update({where: {id: parseInt(req.query.id as string)}, data: { product_name: product_name, barcode: barcode, purchase_price: purchase_price, selling_price: selling_price, stock: stock, categoryId: parseInt(category), updated_at: new Date() }})
+        await prisma.product.update({where: {id: parseInt(req.query.id as string)}, data: { product_name: product_name, barcode: barcode, purchase_price: purchase_price, selling_price: fixed_selling_price.toString(), stock: stock, categoryId: parseInt(category), updated_at: new Date() }})
 
 
         res.status(201).json({
