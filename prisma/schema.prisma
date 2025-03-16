@@ -64,7 +64,7 @@ model Member {
 }
 
 model Transaction {
-  id                Int                 @id @default(autoincrement())
+  id                String                 @id
   discount          Decimal
   total_price       Decimal
   fixed_total_price Decimal
@@ -84,7 +84,7 @@ model TransactionDetail {
   id            Int         @id @default(autoincrement())
   productId     Int
   product       Product     @relation(references: [id], fields: [productId], onDelete: Cascade)
-  transactionId Int
+  transactionId String
   transaction   Transaction @relation(references: [id], fields: [transactionId], onDelete: Cascade)
   selling_price Decimal
   quantity      Int

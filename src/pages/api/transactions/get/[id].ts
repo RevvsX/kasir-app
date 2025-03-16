@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const id = req.query.id
 
 
-        const getData = await prisma.transaction.findFirst({ where: { id: { equals: parseInt(id as string) } }, include: { user: true, member: true, TransactionDetail: { include: { product: true } } } })
+        const getData = await prisma.transaction.findFirst({ where: { id: { equals: id as string } }, include: { user: true, member: true, TransactionDetail: { include: { product: true } } } })
 
         if (getData) {
             res.status(200).json({

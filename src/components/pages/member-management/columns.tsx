@@ -4,14 +4,14 @@ import { ArrowUpDown } from "lucide-react";
 import DeleteModal from "./DeleteModal";
 import EditModal from "./EditModal";
 
-export type Column = {
+export type MemberColumn = {
   id: number;
   name: string;
   address: string;
   phone_number: string;
 };
 
-export const columns: ColumnDef<Column>[] = [
+export const columns: ColumnDef<MemberColumn>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => {

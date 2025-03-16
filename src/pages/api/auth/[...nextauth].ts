@@ -19,7 +19,7 @@ export const authOptions: AuthOptions = {
         const user = await prisma.user.findFirst({ where: { username: credentials?.username } })
 
         if (!user) {
-          throw new Error("User not found l")
+          throw new Error("User not found")
         }
 
         const isPasswordCorrect = await bcrypt.compare(credentials?.password as string, user?.password as string)

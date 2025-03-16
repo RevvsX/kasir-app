@@ -8,7 +8,7 @@ const formschema = z.object({
   selling_price: z
     .string()
     .min(3, "Selling price must be at least 3 characters"),
-  stock: z.number().min(1, "Stock is required"),
+  stock: z.coerce.number().min(1, "Stock is required"),
   category: z.string().min(1, "Category is required"),
   barcode: z.string().min(1, "Barcode is required"),
 });

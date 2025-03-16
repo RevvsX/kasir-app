@@ -4,6 +4,7 @@ import {
   CircleDivide,
   Coins,
   FolderArchive,
+  History,
   LayoutDashboard,
   LogOut,
   ShoppingBag,
@@ -79,6 +80,12 @@ const url = [
         url: "/transactions/cashier",
         icon: Coins,
         canAccess: ["ADMIN", "OFFICER"]
+      },
+      {
+        title: "Transaction History",
+        url: "/transactions/history",
+        icon: History,
+        canAccess: ["ADMIN"]
       },
       {
         title: "Report",

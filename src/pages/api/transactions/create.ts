@@ -40,9 +40,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sub_total: el.total_price,
         }));
 
+
+        const randomId = "TRX" + Date.now().toString()
+
         const transaction = await prisma.$transaction(async (tx) => {
             const transaction = await tx.transaction.create({
                 data: {
+                    id: randomId,
                     change,
                     discount,
                     fixed_total_price,
