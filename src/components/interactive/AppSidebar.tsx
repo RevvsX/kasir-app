@@ -1,16 +1,8 @@
 import {
-  Book,
   ChevronUp,
-  CircleDivide,
-  Coins,
-  FolderArchive,
-  History,
-  LayoutDashboard,
   LogOut,
   ShoppingBag,
   User2,
-  UserCheck2,
-  Users2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -33,69 +25,10 @@ import {
 } from "../ui/dropdown-menu";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { url } from "@/lib/routes";
 
 
 
-const url = [
-  {
-    category: "Applications",
-    url: [
-      {
-        title: "Dashboard",
-        url: "/applications/dashboard",
-        icon: LayoutDashboard,
-        canAccess: ["ADMIN", "OFFICER"]
-      },
-      {
-        title: "User management",
-        url: "/applications/user-management",
-        icon: Users2,
-        canAccess: ["ADMIN"]
-      },
-      {
-        title: "Category product management",
-        url: "/applications/categoryproduct-management",
-        icon: CircleDivide,
-        canAccess: ["ADMIN"]
-      },
-      {
-        title: "Product management",
-        url: "/applications/product-management",
-        icon: FolderArchive,
-        canAccess: ["ADMIN"]
-      },
-      {
-        title: "Member management",
-        url: "/applications/member-management",
-        icon: UserCheck2,
-        canAccess: ["ADMIN"]
-      },
-    ]
-  },
-  {
-    category: "Transactions",
-    url: [
-      {
-        title: "Cashier",
-        url: "/transactions/cashier",
-        icon: Coins,
-        canAccess: ["ADMIN", "OFFICER"]
-      },
-      {
-        title: "Transaction History",
-        url: "/transactions/history",
-        icon: History,
-        canAccess: ["ADMIN"]
-      },
-      {
-        title: "Report",
-        url: "/transactions/report",
-        icon: Book,
-        canAccess: ["ADMIN"]
-      },
-    ]
-  }
-]
 
 
 const AppSidebar = () => {

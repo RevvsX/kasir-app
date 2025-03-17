@@ -1,16 +1,26 @@
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
+import { getToken } from "next-auth/jwt";
 
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if(req.method != "GET"){
+    if (req.method != "GET") {
         res.status(405).json({
             status: "error",
             message: "Method not allowed"
         })
     }
     try {
+        const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+        if (!token) {
+            return res.status(401).json({ status: "error", message: "Unauthorized" });
+        }
+
+        if (token.role !== "ADMIN") {
+            return res.status(403).json({ status: "error", message: "Forbidden" });
+        }
         const { pagenumber, pagelimit, search } = req.query
         const prisma = new PrismaClient()
 
@@ -20,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         let count;
 
         if (search == "") {
-            category = await prisma.category.findMany({ skip: skipping, take: parseInt(pagelimit as string), orderBy: {id: "desc"} })
+            category = await prisma.category.findMany({ skip: skipping, take: parseInt(pagelimit as string), orderBy: { id: "desc" } })
             count = await prisma.category.count()
         } else {
             category = await prisma.category.findMany({
@@ -29,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         contains: search as string
                     }
                 },
-                orderBy: {id: "desc"}
+                orderBy: { id: "desc" }
             })
 
             count = await prisma.category.count({ where: { category_name: { contains: search as string } } })

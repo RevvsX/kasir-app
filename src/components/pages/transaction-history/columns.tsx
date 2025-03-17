@@ -15,7 +15,16 @@ export type TransactionHistoryColumn = {
   fixed_total_price: number;
   money_paid: number;
   change: number;
+  created_at: string;
 };
+
+const formatter = new Intl.DateTimeFormat("id-ID", {
+  year: "numeric",
+  month: "long",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
 export const columns: ColumnDef<TransactionHistoryColumn>[] = [
   {
@@ -33,6 +42,23 @@ export const columns: ColumnDef<TransactionHistoryColumn>[] = [
     },
     cell: ({row})=>{
       return row.index + 1
+    }
+  },
+  {
+    accessorKey: "created_at",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Created At
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({row})=>{
+      return formatter.format(Date.parse(row.getValue("created_at")))
     }
   },
   {
@@ -102,23 +128,6 @@ export const columns: ColumnDef<TransactionHistoryColumn>[] = [
     },
     cell: ({row})=>{
       return parseInt(row.getValue("money_paid") as string).toLocaleString("id-ID", {style: "currency", currency: "IDR"})
-    }
-  },
-  {
-    accessorKey: "change",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Money Change
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({row})=>{
-      return parseInt(row.getValue("change") as string).toLocaleString("id-ID", {style: "currency", currency: "IDR"})
     }
   },
   {
