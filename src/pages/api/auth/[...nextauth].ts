@@ -48,14 +48,29 @@ export const authOptions: AuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      session.user = {
-        id: token.id as number,
-        username: token.username as string,
-        full_name: token.full_name as string,
-        address: token.address as string,
-        role: token.role as string,
-        phone_number: token.phone_number as string,
-      };
+      const user = await prisma.user.findUnique({
+        where: { id: token.id as number },
+        select: {
+          id: true,
+          username: true,
+          full_name: true,
+          address: true,
+          role: true,
+          phone_number: true,
+        },
+      });
+
+      if (user) {
+        session.user = {
+          id: user.id,
+          username: user.username,
+          full_name: user.full_name,
+          address: user.address as string,
+          role: user.role,
+          phone_number: user.phone_number as string,
+        };
+      }
+
       return session;
     },
   },

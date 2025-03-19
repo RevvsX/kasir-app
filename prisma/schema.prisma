@@ -64,7 +64,7 @@ model Member {
 }
 
 model Transaction {
-  id                String                 @id
+  id                String              @id
   discount          Decimal
   total_price       Decimal
   fixed_total_price Decimal
