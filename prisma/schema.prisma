@@ -37,6 +37,8 @@ model Category {
   product       Product[]
   created_at    DateTime  @default(now())
   updated_at    DateTime?
+
+  SeasonalDiscount SeasonalDiscount[]
 }
 
 model Product {
@@ -90,4 +92,17 @@ model TransactionDetail {
   sub_total     Int
   created_at    DateTime    @default(now())
   updated_at    DateTime?
+}
+
+model SeasonalDiscount {
+  id                     Int       @id @default(autoincrement())
+  event_name             String
+  discount               Int
+  minimal_purchase_price Decimal
+  start_date             DateTime
+  end_date               DateTime
+  categoryId             Int
+  category               Category  @relation(fields: [categoryId], references: [id])
+  created_at             DateTime  @default(now())
+  updated_at             DateTime?
 }

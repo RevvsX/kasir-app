@@ -1,4 +1,4 @@
-import { Book, CircleDivide, Coins, FolderArchive, History, LayoutDashboard, UserCheck2, Users2 } from "lucide-react";
+import { Book, Calendar, CircleDivide, Coins, FolderArchive, History, LayoutDashboard, UserCheck2, Users2 } from "lucide-react";
 
 export const url = [
   {
@@ -26,6 +26,12 @@ export const url = [
         title: "Product management",
         url: "/applications/product-management",
         icon: FolderArchive,
+        canAccess: ["ADMIN"]
+      },
+      {
+        title: "Discount management",
+        url: "/applications/seasonaldiscount-management",
+        icon: Calendar,
         canAccess: ["ADMIN"]
       },
       {

@@ -141,8 +141,6 @@ const Index = () => {
           title: "Product not found",
         });
 
-      // console.log(quantity == null)
-
       setProducts((prevProducts) => {
         const existingProduct = prevProducts.find(
           (p) => p.id === response.id
