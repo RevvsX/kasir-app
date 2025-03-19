@@ -17,10 +17,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!token) {
             return res.status(401).json({ status: "error", message: "Unauthorized" });
         }
-
-        if (token.role !== "ADMIN") {
-            return res.status(403).json({ status: "error", message: "Forbidden" });
-        }
         const prisma = new PrismaClient()
         const id = req.query.id
 

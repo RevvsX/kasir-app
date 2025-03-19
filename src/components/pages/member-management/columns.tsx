@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Eye } from "lucide-react";
 import DeleteModal from "./DeleteModal";
 import EditModal from "./EditModal";
+import Link from "next/link";
 
 export type MemberColumn = {
   id: number;
@@ -67,6 +68,9 @@ export const columns: ColumnDef<MemberColumn>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex gap-2">
+          <Button asChild>
+            <Link href={`/member/${row.getValue("id")}`}><Eye/></Link>
+          </Button>
           <EditModal
             id={row.getValue("id")}
             name={row.getValue("name")}

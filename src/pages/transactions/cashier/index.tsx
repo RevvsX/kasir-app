@@ -1,3 +1,4 @@
+import CreateModal from "@/components/pages/member-management/CreateModal";
 import formschema from "@/components/pages/transactions/formschema";
 import {
   AlertDialog,
@@ -140,7 +141,7 @@ const Index = () => {
           title: "Product not found",
         });
 
-      console.log(quantity == null)
+      // console.log(quantity == null)
 
       setProducts((prevProducts) => {
         const existingProduct = prevProducts.find(
@@ -260,6 +261,9 @@ const Index = () => {
     <AppLayout>
       <div className="flex gap-2 w-full">
         <div className="w-1/4 h-[85vh] shadow-md border flex flex-col p-4">
+          <div className="w-full mb-3">
+            <CreateModal/>
+          </div>
           <div className="flex justify-between text-sm items-center">
             <span>Is member</span>
             <span>

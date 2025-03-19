@@ -64,7 +64,7 @@ const CreateModal = () => {
 
     form.reset()
 
-    router.replace(router.pathname)
+    router.push(`/member/${response.data.id}`)
   };
   return (
     <Dialog>

@@ -61,17 +61,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 },
             });
 
-            for (const product of products) {
-                await tx.product.update({
-                    where: { id: product.id },
-                    data: {
-                        stock: {
-                            decrement: product.quantity,
-                        },
-                    },
-                });
-            }
-
             return transaction;
         });
 

@@ -4,6 +4,7 @@ import { ArrowUpDown, Eye } from "lucide-react";
 import { UserColumn } from "../user-management/columns";
 import { MemberColumn } from "../member-management/columns";
 import Link from "next/link";
+import DeleteModal from "./DeleteModal";
 
 export type TransactionHistoryColumn = {
   id: number;
@@ -136,11 +137,12 @@ export const columns: ColumnDef<TransactionHistoryColumn>[] = [
     cell: ({ row }) => {
       return (
        
-        <>
+        <div className="flex gap-2">
           <Button asChild className="bg-blue-500">
             <Link href={`/transactions/cashier/invoice/${row.getValue("id")}`}><Eye/></Link>
           </Button>
-        </>
+          <DeleteModal id={row.getValue("id")}/>
+        </div>
       );
     },
   },
