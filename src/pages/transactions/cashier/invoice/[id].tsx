@@ -119,11 +119,11 @@ const Invoice = ({ data }: { data: InvoiceType }) => {
                         <div className="w-full border my-2"></div>
                         <div className="my-3">
                             <div className="w-full flex justify-between items-center text-xs">
-                                <span>Discount</span>
+                                <span>Discount Member</span>
                                 <span>{data.discount}%</span>
                             </div>
                             <div className="w-full flex justify-between items-center text-xs">
-                                <span>Total</span>
+                                <span>Total Discount</span>
                                 <span>{parseInt(data.fixed_total_price).toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</span>
                             </div>
                             <div className="w-full flex justify-between items-center text-xs">
