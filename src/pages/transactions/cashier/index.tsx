@@ -29,6 +29,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import AppLayout from "@/layout/AppLayout";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { SeasonalDiscount } from "@prisma/client";
 import { Minus, Plus, Search, Trash } from "lucide-react";
 import { useRouter } from "next/router";
 import { FormEvent, useCallback, useEffect, useState } from "react";
@@ -44,6 +45,10 @@ type Product = {
   barcode: string;
   quantity: number;
   total_price: number;
+  discount: number;
+  discount_applied: number;
+  discounted_price: number;
+  minimal_purchase_price: number;
 };
 
 type MemberType = { id: number; name: string; address: string; phone_number: string }
@@ -124,40 +129,66 @@ const Index = () => {
   const addProductByBarcode = async (e: FormEvent) => {
     e.preventDefault();
 
-
-
-    if (barcode.length != 0) {
+    if (barcode.length !== 0) {
       const foundProduct = await fetch(`http://localhost:3000/api/crud/product-management/get/${barcode}`, {
         method: "GET",
         headers: { accept: "application/json" }
-      })
+      });
 
-      const responseJson = await foundProduct.json()
+      const responseJson = await foundProduct.json();
+      const response: Product = responseJson.data;
 
-      const response: Product = responseJson.data
+      if (!response) {
+        return toast({ title: "Product not found" });
+      }
 
-      if (!response)
-        return toast({
-          title: "Product not found",
-        });
+      const discount: SeasonalDiscount | null = responseJson.discount[0] || null;
+      const minimalPurchasePrice = discount ? parseInt(discount.minimal_purchase_price.toString()) : 0;
 
       setProducts((prevProducts) => {
-        const existingProduct = prevProducts.find(
-          (p) => p.id === response.id
-        );
+        const existingProduct = prevProducts.find((p) => p.id === response.id);
 
         if (existingProduct) {
-          return prevProducts.map((p) =>
-            p.id === response.id
-              ? {
-                ...p,
-                quantity: Math.max(1, Math.min(quantity ? p.quantity + quantity : p.quantity + 1, p.stock)),
-                total_price: parseInt(p.selling_price) * (Math.max(1, Math.min(quantity ? p.quantity + quantity : p.quantity + 1, p.stock))),
-              }
-              : p
-          );
+          return prevProducts.map((p) => {
+            if (p.id !== response.id) return p;
+
+            const newQuantity = Math.max(1, Math.min(quantity ? p.quantity + quantity : p.quantity + 1, p.stock));
+            const totalPrice = parseInt(p.selling_price) * newQuantity;
+
+            const isDiscountApplied = discount && totalPrice >= minimalPurchasePrice;
+            const discountAmount = isDiscountApplied ? discount.discount : 0;
+            const discountedPrice = isDiscountApplied ? totalPrice - (totalPrice * (discountAmount / 100)) : totalPrice;
+
+            return {
+              ...p,
+              quantity: newQuantity,
+              total_price: totalPrice,
+              discount_applied: discountAmount,
+              discount: discount? discount.discount: 0,
+              discounted_price: discountedPrice,
+              minimal_purchase_price: minimalPurchasePrice,
+            };
+          });
         } else {
-          return [...prevProducts, { ...response, quantity: (quantity) ? Math.max(1, Math.min(quantity, response.stock)) : 1, total_price: (quantity) ? parseInt(response.selling_price) * (Math.max(1, Math.min(quantity, response.stock))) : parseInt(response.selling_price) }];
+          const newQuantity = Math.max(1, Math.min(quantity, response.stock));
+          const totalPrice = parseInt(response.selling_price) * newQuantity;
+
+          const isDiscountApplied = discount && totalPrice >= minimalPurchasePrice;
+          const discountAmount = isDiscountApplied ? discount.discount : 0;
+          const discountedPrice = isDiscountApplied ? totalPrice - (totalPrice * (discountAmount / 100)) : totalPrice;
+
+          return [
+            ...prevProducts,
+            {
+              ...response,
+              quantity: newQuantity,
+              total_price: totalPrice,
+              discount: discountAmount,
+              discount_applied: discount? discount.discount: 0,
+              discounted_price: discountedPrice,
+              minimal_purchase_price: minimalPurchasePrice,
+            }
+          ];
         }
       });
 
@@ -165,6 +196,8 @@ const Index = () => {
       setQuantity(1);
     }
   };
+
+
 
   function deleteProduct(id: number) {
     setProducts(products.filter((prev) => {
@@ -174,49 +207,67 @@ const Index = () => {
 
   const increaseQuantity = (id: number) => {
     setProducts((prevProducts) =>
-      prevProducts.map((p) =>
-        p.id === id
-          ? {
-            ...p,
-            quantity: Math.max(1, Math.min(p.quantity + 1, p.stock)),
-            total_price: parseInt(p.selling_price) * (Math.max(1, Math.min(p.quantity + 1, p.stock))),
-          }
-          : p
-      )
+      prevProducts.map((p) => {
+        if (p.id !== id) return p;
+
+        const newQuantity = Math.min(p.quantity + 1, p.stock);
+        const totalPrice = parseInt(p.selling_price) * newQuantity;
+
+
+        const isDiscountApplied = p.discount_applied > 0 && totalPrice >= p.minimal_purchase_price;
+        const discountedPrice = isDiscountApplied ? totalPrice - (totalPrice * (p.discount_applied / 100)) : totalPrice;
+
+        return {
+          ...p,
+          quantity: newQuantity,
+          total_price: totalPrice,
+          discount: isDiscountApplied ? p.discount_applied : 0,
+          discounted_price: discountedPrice,
+        };
+      })
     );
   };
 
   const decreaseQuantity = (id: number) => {
     setProducts((prevProducts) =>
       prevProducts
-        .map((p) =>
-          p.id === id
-            ? {
-              ...p,
-              quantity: Math.max(1, p.quantity - 1),
-              total_price: Math.max(parseInt(p.selling_price), parseInt(p.selling_price) * (p.quantity - 1)),
-            }
-            : p
-        )
+        .map((p) => {
+          if (p.id !== id) return p;
+
+          const newQuantity = Math.max(1, p.quantity - 1);
+          const totalPrice = parseInt(p.selling_price) * newQuantity;
+
+
+          const isDiscountApplied = p.discount_applied > 0 && totalPrice >= p.minimal_purchase_price;
+          const discountedPrice = isDiscountApplied ? totalPrice - (totalPrice * (p.discount_applied / 100)) : totalPrice;
+
+          return {
+            ...p,
+            quantity: newQuantity,
+            total_price: totalPrice,
+            discount: isDiscountApplied ? p.discount_applied : 0,
+            discounted_price: discountedPrice,
+          };
+        })
         .filter((p) => p.quantity > 0)
     );
   };
 
+
+
+
   const countTotalPrice = useCallback(() => {
-    let totalHarga = products.reduce(
-      (prev, current) => prev + current.total_price,
-      0
-    );
+    let totalHarga = products.reduce((prev, current) => prev + current.discounted_price, 0);
 
     setTotalHarga(Math.floor(totalHarga));
 
-    if (isMember && member.length != 0) {
+    if (isMember && member.length !== 0) {
       totalHarga = totalHarga - totalHarga * (diskon / 100);
     }
 
+    setTotalHargaFix(Math.floor(totalHarga));
+  }, [products, isMember, member, diskon]);
 
-    setTotalHargaFix(totalHarga);
-  }, [products, isMember, member]);
 
   useEffect(() => {
     countTotalPrice();
@@ -260,7 +311,7 @@ const Index = () => {
       <div className="flex gap-2 w-full">
         <div className="w-1/4 h-[85vh] shadow-md border flex flex-col p-4">
           <div className="w-full mb-3">
-            <CreateModal/>
+            <CreateModal />
           </div>
           <div className="flex justify-between text-sm items-center">
             <span>Is member</span>
@@ -449,8 +500,9 @@ const Index = () => {
             </Button>
           </form>
           <div className="p-2 flex flex-col gap-3 overflow-y-auto max-h-full">
-            {products.map((product) => (
-              <Card key={product.id} className="w-full">
+            {products.map((product) => {
+              console.log(product)
+              return (<Card key={product.id} className="w-full">
                 <CardHeader>
                   <CardTitle className="flex justify-between items-center">
                     <span>{product.product_name} - (Stock: {product.stock})</span>
@@ -483,7 +535,14 @@ const Index = () => {
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">
-                      Rp.{product.total_price.toLocaleString()}
+                      {
+                        (product.discount != 0) ? <div className="flex flex-col"><span className="line-through">
+                          Rp.{product.total_price.toLocaleString()}
+                        </span>
+                          <span>
+                            Rp.{product.discounted_price.toLocaleString()}
+                          </span></div> : <span>Rp.{product.total_price.toLocaleString()}</span>
+                      }
                     </span>
                     <div className="flex items-center gap-2">
                       <Button
@@ -505,7 +564,7 @@ const Index = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         </div>
       </div>

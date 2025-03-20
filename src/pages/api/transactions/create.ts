@@ -37,6 +37,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             quantity: el.quantity,
             selling_price: el.selling_price,
             sub_total: el.total_price,
+            discount: el.discount,
+            sub_total_after_discount: el.discounted_price
         }));
 
 

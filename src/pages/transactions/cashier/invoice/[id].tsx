@@ -22,7 +22,9 @@ type InvoiceType = {
     TransactionDetail: {
         id: number,
         quantity: number,
-        sub_total: number
+        sub_total: number,
+        discount: number,
+        sub_total_after_discount: number,
         product: {
             product_name: string,
         }
@@ -53,7 +55,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 
 const Invoice = ({ data }: { data: InvoiceType }) => {
-    
+
     const printRef = useRef<HTMLDivElement>(null);
     const router = useRouter()
 
@@ -69,7 +71,7 @@ const Invoice = ({ data }: { data: InvoiceType }) => {
         }
     };
 
-    if(data != null){
+    if (data != null) {
 
         return (
             <AppLayout>
@@ -77,7 +79,7 @@ const Invoice = ({ data }: { data: InvoiceType }) => {
                     <div ref={printRef} className="w-[360px] py-10 px-3 shadow-md border">
                         <div className="text-center font-bold">7NightMarket</div>
                         <div className="text-center text-xs">
-                            {new Date(data.created_at).toLocaleString("id-ID", {day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"})}
+                            {new Date(data.created_at).toLocaleString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                         </div>
                         <div className="text-center text-xs">{data.id}</div>
                         <div className="w-full border my-2"></div>
@@ -98,9 +100,19 @@ const Invoice = ({ data }: { data: InvoiceType }) => {
                                     <span>
                                         {el.product.product_name} x {el.quantity}
                                     </span>
-                                    <span>
-                                        {el.sub_total.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
-                                    </span>
+                                    {
+                                        (el.sub_total_after_discount != el.sub_total) ?
+                                            <div className="flex gap-4">
+                                                <span className='line-through'>
+                                                    {el.sub_total.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+                                                </span>
+                                                <span>
+                                                    {el.sub_total_after_discount.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+                                                </span>
+                                            </div> : <span>
+                                                {el.sub_total.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+                                            </span>
+                                    }
                                 </div>
                             ))}
                         </div>
@@ -125,20 +137,20 @@ const Invoice = ({ data }: { data: InvoiceType }) => {
                         </div>
                         <div className="text-center text-xs">Thank youuuuuuu:)</div>
                     </div>
-    
+
                     <div className='flex flex-col gap-2'>
                         <Button onClick={handlePrint}>
                             <Printer className="mr-2" /> Print
                         </Button>
-                        <Button onClick={()=>router.back()}>
-                            <ArrowLeft/> Back
+                        <Button onClick={() => router.back()}>
+                            <ArrowLeft /> Back
                         </Button>
                     </div>
                 </div>
             </AppLayout>
         );
-    }else{
-        return(
+    } else {
+        return (
             <AppLayout>
                 <h1>Transaction not found</h1>
             </AppLayout>

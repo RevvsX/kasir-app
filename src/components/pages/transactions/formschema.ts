@@ -17,6 +17,8 @@ const formschema = z.object({
       barcode: z.string(),
       quantity: z.number(),
       total_price: z.number(),
+      discount: z.number(),
+      discounted_price: z.number()
     })
   )
 });

@@ -25,12 +25,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const barcode = req.query.barcode
 
 
-        const getData = await prisma.product.findFirst({ where: { barcode: { equals: barcode as string }, stock: { not: 0 } } })
+        const getData = await prisma.product.findFirst({ where: { barcode: { equals: barcode as string }, stock: { not: 0 } }, include: {category: {include: {SeasonalDiscount: {where: {AND: {start_date: {lte: new Date(Date.now())}}, end_date: {gte: new Date(Date.now())}}}}}} })
 
         if (getData) {
             res.status(200).json({
                 "status": "success",
-                "data": getData
+                "data": getData,
+                "discount": getData.category.SeasonalDiscount
             })
         } else {
             res.status(404).json({

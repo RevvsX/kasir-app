@@ -82,16 +82,18 @@ model Transaction {
 }
 
 model TransactionDetail {
-  id            Int         @id @default(autoincrement())
-  productId     Int
-  product       Product     @relation(references: [id], fields: [productId], onDelete: Cascade)
-  transactionId String
-  transaction   Transaction @relation(references: [id], fields: [transactionId], onDelete: Cascade)
-  selling_price Decimal
-  quantity      Int
-  sub_total     Int
-  created_at    DateTime    @default(now())
-  updated_at    DateTime?
+  id                       Int         @id @default(autoincrement())
+  productId                Int
+  product                  Product     @relation(references: [id], fields: [productId], onDelete: Cascade)
+  transactionId            String
+  transaction              Transaction @relation(references: [id], fields: [transactionId], onDelete: Cascade)
+  selling_price            Decimal
+  quantity                 Int
+  sub_total                Int
+  discount                 Int
+  sub_total_after_discount Int
+  created_at               DateTime    @default(now())
+  updated_at               DateTime?
 }
 
 model SeasonalDiscount {
